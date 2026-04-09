@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Tickets</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f6fa;
+            margin: 0;
+        }
+
+        /* 🔝 Navbar */
+        .navbar {
+            background: #2d3436;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .navbar span {
+            color: #ffeaa7;
+            font-weight: bold;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #2f3640;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f1f2f6;
+        }
+
+        img {
+            border-radius: 6px;
+        }
+
+        .empty {
+            text-align: center;
+            color: gray;
+        }
+
+        /* 🆕 PDF Button */
+        .pdf-btn {
+            background: #0984e3;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .pdf-btn:hover {
+            background: #0652dd;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 🔝 Navbar (UPDATED) -->
+<div class="navbar">
+    <a href="/">🏠 Home</a>
+    <a href="{% url 'ticket_list' %}">🎫 Tickets</a>
+
+    {% if user.is_authenticated %}
+        <span>👤 {{ user.username }}</span>
+        <a href="{% url 'logout' %}">🚪 Logout</a>
+    {% else %}
+        <a href="{% url 'login' %}">🔐 Login</a>
+        <a href="{% url 'register' %}">📝 Register</a>
+    {% endif %}
+</div>
+
+<h1>🎫 All Tickets</h1>
+
+<table>
+    <tr>
+        <th>Passenger Name</th>
+        <th>Bus Name</th>
+        <th>Seat</th>
+        <th>Date</th>
+        <th>QR Code</th>
+        <th>PDF</th>
+    </tr>
+
+    {% for ticket in tickets %}
+    <tr>
+        <td>{{ ticket.passenger_name }}</td>
+        <td>{{ ticket.bus.name }}</td>
+        <td>{{ ticket.seat_number }}</td>
+        <td>{{ ticket.travel_date }}</td>
+
+        <!-- 🔥 QR -->
+        <td>
+            {% if ticket.qr_code %}
+                <img src="{{ ticket.qr_code.url }}" width="80">
+            {% else %}
+                <img src="/media/{{ ticket.ticket_id }}.png" width="80">
+            {% endif %}
+        </td>
+
+        <!-- 🆕 PDF BUTTON -->
+        <td>
+            <a href="{% url 'download_ticket' ticket.id %}" class="pdf-btn">
+                📄 Download
+            </a>
+        </td>
+    </tr>
+
+    {% empty %}
+    <tr>
+        <td colspan="6" class="empty">No tickets found</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

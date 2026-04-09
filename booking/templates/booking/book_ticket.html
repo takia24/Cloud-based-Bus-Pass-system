@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Ticket</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #dfe6e9;
+            margin: 0;
+        }
+
+        /* 🔝 Navbar */
+        .navbar {
+            background: #2d3436;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .navbar span {
+            color: #ffeaa7;
+            font-weight: bold;
+        }
+
+        .container {
+            text-align: center;
+            padding-top: 40px;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            width: 360px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        input {
+            padding: 10px;
+            width: 90%;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            background: #00b894;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #019875;
+        }
+
+        /* Seat */
+        .seats {
+            margin-top: 15px;
+        }
+
+        .seat {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 5px;
+            background: #74b9ff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .seat:hover {
+            background: #0984e3;
+        }
+
+        .selected {
+            background: #00b894 !important;
+        }
+
+        .disabled {
+            background: gray !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 🔝 Navbar (UPDATED) -->
+<div class="navbar">
+    <a href="/">🏠 Home</a>
+    <a href="{% url 'ticket_list' %}">🎫 Tickets</a>
+
+    {% if user.is_authenticated %}
+        <span>👤 {{ user.username }}</span>
+        <a href="{% url 'logout' %}">🚪 Logout</a>
+    {% else %}
+        <a href="{% url 'login' %}">🔐 Login</a>
+        <a href="{% url 'register' %}">📝 Register</a>
+    {% endif %}
+</div>
+
+<div class="container">
+    <div class="box">
+        <h2>🚌 Book: {{ bus.name }}</h2>
+        <p>{{ bus.route }} | {{ bus.price }} BDT</p>
+
+        <!-- 🔴 Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="tel" name="phone" placeholder="Phone Number" required>
+            <input type="text" name="location" placeholder="Pickup Location" required>
+
+            <!-- 🟢 Seat Selection -->
+            <div class="seats">
+                <p><b>Select Seat:</b></p>
+
+                <div class="seat {% if 'A1' in booked_seats %}disabled{% endif %}" onclick="selectSeat(this)">A1</div>
+                <div class="seat {% if 'A2' in booked_seats %}disabled{% endif %}" onclick="selectSeat(this)">A2</div>
+                <div class="seat {% if 'A3' in booked_seats %}disabled{% endif %}" onclick="selectSeat(this)">A3</div>
+
+                <div class="seat {% if 'B1' in booked_seats %}disabled{% endif %}" onclick="selectSeat(this)">B1</div>
+                <div class="seat {% if 'B2' in booked_seats %}disabled{% endif %}" onclick="selectSeat(this)">B2</div>
+                <div class="seat {% if 'B3' in booked_seats %}disabled{% endif %}" onclick="selectSeat(this)">B3</div>
+            </div>
+
+            <!-- Hidden -->
+            <input type="text" id="seatInput" name="seat" placeholder="Selected Seat" readonly required>
+
+            <input type="date" name="date" required>
+
+            <button type="submit">Confirm Booking</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function selectSeat(element) {
+    if (element.classList.contains('disabled')) return;
+
+    let seats = document.querySelectorAll('.seat');
+    seats.forEach(s => s.classList.remove('selected'));
+
+    element.classList.add('selected');
+    document.getElementById('seatInput').value = element.innerText;
+}
+</script>
+
+</body>
+</html>

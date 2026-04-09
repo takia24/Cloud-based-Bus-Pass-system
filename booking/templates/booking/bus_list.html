@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bus Pass System</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f6fa;
+            margin: 0;
+        }
+
+        /* 🔝 Navbar */
+        .navbar {
+            background: #2d3436;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .navbar span {
+            color: #ffeaa7;
+            font-weight: bold;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .top-btn {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .top-btn a {
+            padding: 10px 20px;
+            background: #00b894;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        table {
+            width: 90%;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #2f3640;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f1f2f6;
+        }
+
+        .book-btn {
+            padding: 6px 12px;
+            background: #0984e3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .book-btn:hover {
+            background: #0652DD;
+        }
+
+        .message {
+            text-align: center;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 🔝 Navbar -->
+<div class="navbar">
+    <a href="/">🏠 Home</a>
+    <a href="{% url 'ticket_list' %}">🎫 Tickets</a>
+
+    {% if user.is_authenticated %}
+        <span>👤 {{ user.username }}</span>
+        <a href="{% url 'logout' %}">🚪 Logout</a>
+    {% else %}
+        <a href="{% url 'login' %}">🔐 Login</a>
+        <a href="{% url 'register' %}">📝 Register</a>
+    {% endif %}
+</div>
+
+<h1>🚌 Available Buses</h1>
+
+<!-- 🎫 Button -->
+<div class="top-btn">
+    <a href="{% url 'ticket_list' %}">🎫 View My Tickets</a>
+</div>
+
+<!-- ✅ Messages -->
+{% if messages %}
+    {% for message in messages %}
+        <p class="message">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Route</th>
+        <th>Price</th>
+        <th>Time</th>
+        <th>Action</th>
+    </tr>
+
+    {% for bus in buses %}
+    <tr>
+        <td>{{ bus.name }}</td>
+        <td>{{ bus.route }}</td>
+        <td>{{ bus.price }} BDT</td>
+        <td>{{ bus.departure_time }} - {{ bus.arrival_time }}</td>
+        <td>
+            <a class="book-btn" href="{% url 'book_ticket' bus.id %}">
+                Book
+            </a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">No buses available</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
